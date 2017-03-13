@@ -24,12 +24,12 @@ var legacyOptions = {
     'propWhiteList': 'propList'
 };
 
-module.exports = postcss.plugin('postcss-pxtorem', function (options) {
+module.exports = postcss.plugin('postcss-px-transformer', function (options) {
 
     convertLegacyOptions(options);
 
     var opts = objectAssign({}, defaults, options);
-    var pxReplace = createPxReplace(opts.rootValue, opts.unitPrecision, opts.minPixelValue);
+    var pxReplace = createPxReplace(opts.rootValue, opts.unitPrecision, opts.minPixelValue, opts.unitName);
 
     var satisfyPropList = createPropListMatcher(opts.propList);
 
@@ -86,13 +86,13 @@ function convertLegacyOptions(options) {
     });
 }
 
-function createPxReplace (rootValue, unitPrecision, minPixelValue) {
+function createPxReplace (rootValue, unitPrecision, minPixelValue, unitName) {
     return function (m, $1) {
         if (!$1) return m;
         var pixels = parseFloat($1);
         if (pixels < minPixelValue) return m;
         var fixedVal = toFixed((pixels / rootValue), unitPrecision);
-        return (fixedVal === 0) ? '0' : fixedVal + 'rem';
+        return (fixedVal === 0) ? '0' : fixedVal + (unitName || 'rem');
     };
 }
 
